@@ -13,4 +13,24 @@
         <item name="android:windowBackground">@color/colorBG</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
     </style>
+
+
+    <!--No TitleBar -->
+    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/colorBG</item>
+        <item name="android:buttonStyle">@style/SplashButton</item>
+        <item name="buttonStyle">@style/SplashButton</item>
+    </style>
+
+
+    <!--Splash Screen Button -->
+    <style name="SplashButton" parent="Theme.AppCompat">
+        <item name="colorButtonNormal">@color/splash</item>
+        <item name="colorControlHighlight">@color/colorBG</item>
+    </style>
+
+
 </resources>

@@ -14,6 +14,57 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:srcCompat="@drawable/splash_logo"
             android:id="@+id/imageView"/>
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  app:layout_constraintBottom_toBottomOf="parent"
+                  app:layout_constraintRight_toRightOf="parent"
+                  android:orientation="horizontal"
+                  android:gravity="center_horizontal"
+                  android:id="@+id/lay_connect_gplus"
+                  android:layout_marginBottom="@dimen/activity_vertical_margin"
+                  android:layout_marginTop="@dimen/activity_vertical_margin"
+
+    >
+
+    <com.google.android.gms.common.SignInButton android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/google_sign_in"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:theme="@style/SplashButton"
+            android:id="@+id/gsign"/>
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  app:layout_constraintBottom_toTopOf="@id/lay_connect_gplus"
+                  app:layout_constraintRight_toRightOf="parent"
+                  android:orientation="horizontal"
+                  android:gravity="center_horizontal"
+                  android:layout_marginTop="@dimen/activity_vertical_margin"
+                  android:id="@+id/reg_buttons"
+    >
+
+        <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_up_button"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:theme="@style/SplashButton"
+                android:id="@+id/signup"
+        />
+
+        <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_activity_login"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:theme="@style/SplashButton"
+                android:id="@+id/login"
+        />
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

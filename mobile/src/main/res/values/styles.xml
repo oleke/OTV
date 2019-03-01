@@ -3,6 +3,8 @@
     <!-- ActionBar Style. -->
     <style name="ActionBarStyle" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="android:fontFamily">@font/ibmplexsans</item>
+        <item name="android:background">@color/colorToolbar</item>
+        <item name="background">@color/colorToolbar</item>
     </style>
 
     <!-- Base application theme. -->
@@ -21,6 +23,32 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@color/colorBG</item>
+        <item name="android:buttonStyle">@style/SplashButton</item>
+        <item name="buttonStyle">@style/SplashButton</item>
+    </style>
+
+
+    <!--Splash Screen Button -->
+    <style name="SplashButton" parent="Theme.AppCompat">
+        <item name="colorButtonNormal">@color/splash</item>
+        <item name="colorControlHighlight">@color/colorBG</item>
+    </style>
+
+
+    <!-- Login theme. -->
+    <style name="LoginTheme" parent="Theme.MaterialComponents">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/colorBG</item>
+        <item name="actionBarStyle">@style/ActionBarStyle</item>
+
+        <item name="colorControlNormal">@color/iron</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/white</item>
+        <item name="android:textColorHint">@color/iron</item>
+
     </style>
 
 </resources>

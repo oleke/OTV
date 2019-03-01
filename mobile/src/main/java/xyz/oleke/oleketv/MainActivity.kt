@@ -5,6 +5,7 @@
 
 package xyz.oleke.oleketv
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -19,10 +20,17 @@ class MainActivity : AppCompatActivity() {
 
     private var mSurface: SurfaceView? = null
 
+    private var account: Account? = null
+
     private var videoController: VideoController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        account = intent.getSerializableExtra("account") as? Account
+
+        if(account!!.getUser().activeSubscription==null){
+            showSubscription(account!!)
+        }
         configureToolbar()
         loadChannels()
     }
@@ -123,6 +131,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+
+    /*
+    * Show the subscription Page
+     */
+    private fun showSubscription(account: Account){
+        val main = Intent(this, Subscription::class.java)
+        main.putExtra("account",account)
+        startActivity(main)
     }
 
 }

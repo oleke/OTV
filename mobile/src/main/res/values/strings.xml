@@ -9,8 +9,8 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
+    <string name="permission_rationale">Contacts permissions are needed for providing email
+        completions.
     </string>
 
 
@@ -18,4 +18,20 @@
     <string name="app_name">O\'lekeTV</string>
     <string name="search_title">Search Channel</string>
     <string name="main_setting">Settings</string>
+    <string name="title_activity_login">Log in</string>
+    <string name="sign_up_button">Register</string>
+    <string name="google_sign_in">Connect with Google</string>
+    <string name="title_activity_sign_up">Register</string>
+    <string name="title_activity_subscription">Subscription</string>
+
+
+
+    <string-array name="months">
+        <item>1</item>
+        <item>3</item>
+        <item>6</item>
+        <item>12</item>
+        <item>18</item>
+        <item>24</item>
+    </string-array>
 </resources>
