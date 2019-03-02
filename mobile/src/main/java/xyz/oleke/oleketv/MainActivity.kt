@@ -15,14 +15,21 @@ import android.view.Menu
 import android.view.SurfaceView
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+
+    private val api = API()
 
     private var mSurface: SurfaceView? = null
 
     private var account: Account? = null
 
     private var videoController: VideoController? = null
+
+    private var channelList: List<Model.Channel>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             showSubscription(account!!)
         }
         configureToolbar()
-        loadChannels()
+        getChannels()
     }
 
 
@@ -56,11 +63,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun loadChannels() {
+    fun loadChannels(channels: List<Model.Channel>) {
 
+        channelList = channels
         var viewManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
-        val myDataset = ArrayList<Channel>(3)
-        myDataset.add(
+
+       /* myDataset.add(
             Channel(
                 "CNN",
                 "http://portal.geniptv.com:8080/live/SBdhvpwoih/XkTGg0Yt3Z/1764.ts",
@@ -81,8 +89,9 @@ class MainActivity : AppCompatActivity() {
                 "https://yt3.ggpht.com/a-/AAuE7mDKm-m6CgM4tCg9NtXQvAYQWxBJcFR1FgxzmA=s900-mo-c-c0xffffffff-rj-k-no"
             )
         )
+        */
         var viewAdapter: RecyclerView.Adapter<*> =
-            ChannelAdapter(myDataset) { channel: Channel -> channelClicked(channel) }
+            ChannelAdapter(channels) { channel: Model.Channel -> channelClicked(channel) }
 
         var recyclerView: RecyclerView = findViewById<RecyclerView>(R.id.channels).apply {
             // use this setting to improve performance if you know that changes
@@ -96,6 +105,14 @@ class MainActivity : AppCompatActivity() {
             adapter = viewAdapter
         }
 
+    }
+
+    fun getChannels() {
+        val request = api.getChannels()
+        GlobalScope.launch(Dispatchers.Main) {
+            val plans = request.await()
+            this@MainActivity.loadChannels(plans)
+        }
     }
 
 
@@ -122,12 +139,12 @@ class MainActivity : AppCompatActivity() {
     /*
     * Handle the channel click event
      */
-    fun channelClicked(channel: Channel): Boolean {
+    fun channelClicked(channel: Model.Channel): Boolean {
         if (videoController == null) {
-            createPlayer(channel.getURL())
+            createPlayer(account!!.getUser().activeSubscription!!.service_provider!!.url+"/"+channel.serviceID)
             show(videoView1)
         } else {
-            videoController!!.changeChannel(channel.getURL())
+            videoController!!.changeChannel(account!!.getUser().activeSubscription!!.service_provider!!.url+"/"+channel.serviceID)
         }
 
         return true

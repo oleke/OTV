@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.recycler_view_item_1.view.*
 /*
     Class definition implementing the RecyclerView Adaper
  */
-class ChannelAdapter(private val myDataset: List<Channel>, val clickListener: (Channel) -> Boolean) :
+class ChannelAdapter(private val myDataset: List<Model.Channel>, val clickListener: (Model.Channel) -> Boolean) :
     RecyclerView.Adapter<ChannelAdapter.MyViewHolder>() {
 
     // Provide a reference to the views for each data item
@@ -22,10 +22,13 @@ class ChannelAdapter(private val myDataset: List<Channel>, val clickListener: (C
     // you provide access to all the views for a data item in a view holder.
     // Each data item is just a string in this case that is shown in a TextView.
     class MyViewHolder(val channelView: ViewGroup) : RecyclerView.ViewHolder(channelView) {
-        fun bind(channel: Channel, clickListener: (Channel) -> Boolean) {
-            channelView.textView1.text = channel.getName()
-            println(channel.getName())
-            Glide.with(channelView.context).load(channel.getIcon()).into(channelView.imageView1)
+        fun bind(channel: Model.Channel, clickListener: (Model.Channel) -> Boolean) {
+            channelView.textView1.text = channel.name
+            //println(channel.getName())
+            var logo = channel.logo
+            if(logo=="")
+                logo = "https://cdn2.iconfinder.com/data/icons/pictograms-3/512/25-512.png"
+            Glide.with(channelView.context).load(logo).into(channelView.imageView1)
             channelView.setOnClickListener {
                 clickListener(channel)
             }

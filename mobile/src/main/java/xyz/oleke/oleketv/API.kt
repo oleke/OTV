@@ -44,4 +44,8 @@ class API {
         return rxAPI.newSubscription(user_id,plan,duration)
     }
 
+    fun getChannels():Deferred<List<Model.Channel>>{
+        return rxAPI.getChannels();
+    }
+
 }

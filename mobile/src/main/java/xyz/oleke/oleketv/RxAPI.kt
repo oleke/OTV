@@ -21,7 +21,7 @@ object Model{
         }
     }
     data class ChannelGroup(val id: Int, val name:String):Serializable
-    data class Channel(val id: Int, val name: String, val logo: String, val subscriptionPlan:SubscriptionPlan, val channelGroup: ChannelGroup):Serializable
+    data class Channel(val id: Int, val name: String, val logo: String, val subscriptionPlan:SubscriptionPlan, val channelGroup:Int,val serviceID:Int):Serializable
 }
 
 
@@ -57,4 +57,18 @@ interface  RxAPI{
      */
     @POST("/api/subscribe")
     fun newSubscription(@Query("user_id") user_id:Int, @Query("plan") plan:Int, @Query("duration") duration:Int):Deferred<Model.User>
+
+
+    /*
+   * Get Channels
+    */
+    @GET("/api/channels?all")
+    fun getChannels(): Deferred<List<Model.Channel>>
+
+    /*
+  * Get ChannelGroups
+   */
+    @GET("/api/groups?all")
+    fun getChannelGroups(): Deferred<List<Model.ChannelGroup>>
+
 }
