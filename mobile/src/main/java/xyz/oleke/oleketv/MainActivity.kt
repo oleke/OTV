@@ -141,10 +141,10 @@ class MainActivity : AppCompatActivity() {
      */
     fun channelClicked(channel: Model.Channel): Boolean {
         if (videoController == null) {
-            createPlayer(account!!.getUser().activeSubscription!!.service_provider!!.url+"/"+channel.serviceID)
+            createPlayer("http://"+account!!.getUser().activeSubscription!!.service_provider!!.url+"/"+channel.service_id+".ts")
             show(videoView1)
         } else {
-            videoController!!.changeChannel(account!!.getUser().activeSubscription!!.service_provider!!.url+"/"+channel.serviceID)
+            videoController!!.changeChannel("http://"+account!!.getUser().activeSubscription!!.service_provider!!.url+"/"+channel.service_id+".ts")
         }
 
         return true

@@ -21,7 +21,7 @@ object Model{
         }
     }
     data class ChannelGroup(val id: Int, val name:String):Serializable
-    data class Channel(val id: Int, val name: String, val logo: String, val subscriptionPlan:SubscriptionPlan, val channelGroup:Int,val serviceID:Int):Serializable
+    data class Channel(val id: Int, val name: String, val logo: String, val subscription_plan:Int, val channel_group:Int,val service_id:Int):Serializable
 }
 
 
