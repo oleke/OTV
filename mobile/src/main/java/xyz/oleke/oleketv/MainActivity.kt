@@ -6,15 +6,22 @@
 package xyz.oleke.oleketv
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
+import android.provider.Settings
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.view.Menu
-import android.view.SurfaceView
-import android.view.View
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.*
+import android.widget.MediaController
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.search_view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -29,8 +36,13 @@ class MainActivity : AppCompatActivity() {
 
     private var videoController: VideoController? = null
 
+    private var mediaController: MediaController? =null
+
     private var channelList: List<Model.Channel>? = null
 
+    var prefs: Prefs? = null
+
+    var currentChannel: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         account = intent.getSerializableExtra("account") as? Account
@@ -38,11 +50,123 @@ class MainActivity : AppCompatActivity() {
         if(account!!.getUser().activeSubscription==null){
             showSubscription(account!!)
         }
+
+        checkOtherDevice()
+
+        prefs = Prefs(this)
+        prefs!!.userID = account!!.getUser().id
+
+
+
         configureToolbar()
         getChannels()
+
+        search_input_text.addTextChangedListener(object :TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if(count >=3){
+                    doSearch()
+                }
+                else if(count==0){
+                    if(channelList!=null){
+                        loadChannels(channelList!!)
+                    }
+
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+        })
+
+
+       execute_search_button.setOnClickListener {
+            doSearch()
+        }
+
+        close_search_button.setOnClickListener {
+            search_view.closeSearch()
+            loadChannels(channelList!!)
+        }
+
+    }
+
+    private fun checkOtherDevice() {
+        val device = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        if(account!!.getUser().device!=device){
+            // Initialize a new instance of
+            val builder = AlertDialog.Builder(this@MainActivity)
+
+            // Set the alert dialog title
+            builder.setTitle("Login Activity")
+
+            // Display a message on alert dialog
+            builder.setMessage("You are already logged in on another device.")
+
+            // Set a positive button and its click listener on alert dialog
+            builder.setPositiveButton("OK"){dialog, which ->
+                //showSplash()
+            }
+
+            // Finally, make the alert dialog using builder
+            val dialog: AlertDialog = builder.create()
+
+            // Display the alert dialog on app interface
+            //dialog.show()
+
+        }
     }
 
 
+    fun doSearch(){
+        val term = search_input_text.text
+        var entry:MutableList<Model.Channel> = mutableListOf<Model.Channel>()
+        channelList!!.iterator().forEach {
+            if(it.name.contains(term,ignoreCase = true))
+                entry.add(it)
+        }
+        loadChannels(entry.toList())
+    }
+
+    fun findIndex(term:String):Int{
+        var index:Int = 0
+        for (i in channelList!!.indices){
+            if(channelList!![i].name.startsWith(term)){
+                index = i
+                break
+            }
+        }
+        return index
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        Log.d("Config",newConfig!!.orientation.toString())
+        when {
+            newConfig!!.orientation==Configuration.ORIENTATION_PORTRAIT -> {
+                channels.visibility = View.VISIBLE
+                my_toolbar.visibility = View.VISIBLE
+                supportActionBar!!.show()
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                window.setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+                //videoController!!.resizeScreen(videoView1.width-1,videoView1.height-1)
+            }
+            newConfig!!.orientation==Configuration.ORIENTATION_LANDSCAPE ->{
+                channels.visibility = View.GONE
+                my_toolbar.visibility = View.GONE
+                supportActionBar!!.hide()
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                videoController!!.resizeScreen(videoView1.width-1,videoView1.height-1)
+            }
+            else -> {
+
+            }
+        }
+    }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.mainmenu, menu)
 
@@ -53,47 +177,26 @@ class MainActivity : AppCompatActivity() {
 
 
     // Configure the toolbar
-    fun configureToolbar() {
+    private fun configureToolbar() {
         setContentView(R.layout.activity_main)
         val mainmenu: Toolbar = findViewById(R.id.my_toolbar)
         setSupportActionBar(mainmenu)
         mainmenu.setNavigationIcon(R.drawable.ic_action_logo1)
         val actionBar = supportActionBar
-        //actionBar!!.setDisplayShowTitleEnabled(false)
+        actionBar!!.setDisplayShowTitleEnabled(false)
     }
 
 
     fun loadChannels(channels: List<Model.Channel>) {
-
-        channelList = channels
+        if(channelList===null) {
+            channelList = channels
+        }
         var viewManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
-
-       /* myDataset.add(
-            Channel(
-                "CNN",
-                "http://portal.geniptv.com:8080/live/SBdhvpwoih/XkTGg0Yt3Z/1764.ts",
-                "https://cdn.cnn.com/cnn/.e1mo/img/4.0/logos/CNN_logo_400x400.png"
-            )
-        )
-        myDataset.add(
-            Channel(
-                "BBC",
-                "http://portal.geniptv.com:8080/live/SBdhvpwoih/XkTGg0Yt3Z/2006.ts",
-                "https://m.files.bbci.co.uk/modules/bbc-morph-news-waf-page-meta/2.3.0/bbc_news_logo.png"
-            )
-        )
-        myDataset.add(
-            Channel(
-                "Aljazeera",
-                "http://portal.geniptv.com:8080/live/SBdhvpwoih/XkTGg0Yt3Z/4612.ts",
-                "https://yt3.ggpht.com/a-/AAuE7mDKm-m6CgM4tCg9NtXQvAYQWxBJcFR1FgxzmA=s900-mo-c-c0xffffffff-rj-k-no"
-            )
-        )
-        */
+        var indexManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         var viewAdapter: RecyclerView.Adapter<*> =
-            ChannelAdapter(channels) { channel: Model.Channel -> channelClicked(channel) }
+            ChannelAdapter(channels) { channel: Model.Channel,position:Int -> channelClicked(channel,position) }
 
-        var recyclerView: RecyclerView = findViewById<RecyclerView>(R.id.channels).apply {
+        findViewById<RecyclerView>(R.id.channels).apply {
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
             setHasFixedSize(true)
@@ -105,6 +208,21 @@ class MainActivity : AppCompatActivity() {
             adapter = viewAdapter
         }
 
+        side_bar.apply {
+            setHasFixedSize(true)
+
+            layoutManager = indexManager
+            val alphas = arrayListOf("A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z")
+            adapter = IndexAdapter(alphas){listView:String -> indexClicked(listView)}
+        }
+
+    }
+
+    private fun indexClicked(listView: String): Boolean {
+        val index = findIndex(listView)
+        channels.layoutManager!!.offsetChildrenVertical(index)
+        channels.layoutManager!!.scrollToPosition(index)
+        return true
     }
 
     fun getChannels() {
@@ -121,14 +239,40 @@ class MainActivity : AppCompatActivity() {
      * @param media
      */
     fun createPlayer(media: String) {
+        //supportActionBar!!.hide()
         mSurface = videoView1
         videoController = VideoController(this)
         videoController!!.mSurface = mSurface
         videoController!!.createPlayer(media)
+        //mediaController = MediaController(this,false)
+        videoController!!.setAnchorView(videoController!!.mSurface)
+        //mediaController!!.setAnchorView(videoController!!.mSurface)
+        videoController!!.setMediaPlayer(videoController)
+        videoController!!.contentDescription = channelList!![currentChannel].name!!
+        videoController!!.setPrevNextListeners({next->
+            if((currentChannel+1)<channelList!!.size){
+                channelClicked(channelList!![currentChannel+1],currentChannel+1)
+            }
 
+        }, {    prev->
+                if((currentChannel-1)>=0){
+                    channelClicked(channelList!![currentChannel-1],currentChannel-1)
+                }
+        })
+
+        videoController!!.keepScreenOn = true
+
+        mSurface!!.setOnClickListener {
+            //videoController!!.show(3000)
+        }
+
+        mSurface!!.setOnTouchListener{
+            v: View, m: MotionEvent ->
+            videoController!!.show(3000)
+            true
+        }
+        //supportActionBar!!.hide()
     }
-
-
     /*
     * Show Hidden View
      */
@@ -139,7 +283,8 @@ class MainActivity : AppCompatActivity() {
     /*
     * Handle the channel click event
      */
-    fun channelClicked(channel: Model.Channel): Boolean {
+    private fun channelClicked(channel: Model.Channel,position:Int): Boolean {
+        currentChannel = position
         if (videoController == null) {
             createPlayer("http://"+account!!.getUser().activeSubscription!!.service_provider!!.url+"/"+channel.service_id+".ts")
             show(videoView1)
@@ -158,6 +303,16 @@ class MainActivity : AppCompatActivity() {
         val main = Intent(this, Subscription::class.java)
         main.putExtra("account",account)
         startActivity(main)
+    }
+
+
+    /*
+    * Show the Splash Screen
+     */
+    private fun showSplash(){
+        val main = Intent(this, SplashScreen::class.java)
+        startActivity(main)
+        finish()
     }
 
 }

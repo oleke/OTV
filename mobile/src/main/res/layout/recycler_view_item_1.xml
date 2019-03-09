@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:orientation="horizontal"
               android:padding="8dp"
               android:layout_width="match_parent"
@@ -8,8 +13,8 @@
               android:background="@color/colorBG">
     <ImageView
             android:id="@+id/imageView1"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             tools:src="@tools:sample/avatars"/>
     <TextView
             android:id="@+id/textView1"
@@ -18,5 +23,20 @@
             android:layout_gravity="center"
             android:padding="5dp"
             android:textColor="@color/colorPrimary"
+            android:textSize="10dip"
             tools:text="@tools:sample/lorem"/>
+</LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:tools="http://schemas.android.com/tools"
+                  android:orientation="horizontal"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content">
+        <View android:id="@+id/separator"
+              android:background="@color/white"
+              android:layout_width = "fill_parent"
+              android:layout_height="1dip"
+              android:layout_marginLeft="42dp"
+              android:layout_centerVertical ="true"
+              android:layout_alignParentTop="true"/>
+    </LinearLayout>
 </LinearLayout>

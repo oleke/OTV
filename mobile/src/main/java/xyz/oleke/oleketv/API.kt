@@ -26,6 +26,11 @@ class API {
         return rxAPI.authUser(email,password)
     }
 
+
+    fun getUser(id: Int): Deferred<Model.User>{
+        return rxAPI.getUser(id)
+    }
+
     fun newUser(name:String, email:String, phone:String, password:String,context:ContentResolver): Deferred<Model.User> {
         val id = UUID.randomUUID().hashCode()
         val device = Settings.Secure.getString(context,Settings.Secure.ANDROID_ID)

@@ -32,6 +32,10 @@ class SplashScreen : AppCompatActivity(), View.OnClickListener {
 
     private val RC_SIGN_IN:Int = 9999
 
+    var prefs: Prefs? = null
+
+    private val delay: Long = 5000
+
     override fun onClick(v: View?) {
         when(v!!.id){
             R.id.gsign -> googleSignUp()
@@ -43,24 +47,30 @@ class SplashScreen : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    //private val delay: Long = 2000
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
-        /*Handler().postDelayed({
-            //this.finish()
-        }, delay)
-    */
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("756406194557-egfgc6ama761a67n6ujj0u1kpi7nifbp.apps.googleusercontent.com")
-            .requestEmail()
-            .build()
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        
+        prefs = Prefs(this)
+        if(prefs!!.userID!==0) {
+            returningUser(prefs!!.userID)
+        }
+        else {
+            findViewById<SignInButton>(R.id.gsign).visibility = View.VISIBLE
+            findViewById<Button>(R.id.signup).visibility = View.VISIBLE
+            findViewById<Button>(R.id.login).visibility = View.VISIBLE
 
-        findViewById<SignInButton>(R.id.gsign).setOnClickListener(this)
-        findViewById<Button>(R.id.signup).setOnClickListener(this)
-        findViewById<Button>(R.id.login).setOnClickListener(this)
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("756406194557-egfgc6ama761a67n6ujj0u1kpi7nifbp.apps.googleusercontent.com")
+                .requestEmail()
+                .build()
+            mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
+            findViewById<SignInButton>(R.id.gsign).setOnClickListener(this)
+            findViewById<Button>(R.id.signup).setOnClickListener(this)
+            findViewById<Button>(R.id.login).setOnClickListener(this)
+        }
         //val gs: GoogleSignInAccount? = checkGoogleSignIn()
         //if(gs!=null)
             //showMain(Account(gs))
@@ -124,6 +134,36 @@ class SplashScreen : AppCompatActivity(), View.OnClickListener {
                 catch (e:ApiException){
                     Log.w("SplashScreen", "signInResult:failed code=" + e.statusCode);
                 }
+
+            }
+        }
+    }
+
+
+    private fun returningUser(id:Int){
+        val api = API()
+        GlobalScope.launch(Dispatchers.Main) {
+
+            val request = api.getUser(id)
+            try{
+                val response = request.await()
+                if(response?.name != null){
+                    Log.d(TAG,response.name)
+                    val main = Intent(this@SplashScreen, MainActivity::class.java)
+                    main.putExtra("account",Account(response))
+                    startActivity(main)
+                    finish()
+                }
+                else{
+                    Toast.makeText(baseContext,"User could not be returned",Toast.LENGTH_LONG).show()
+
+                }
+            }
+            catch (e: HttpException) {
+                Log.d(TAG,e.code().toString())
+
+            } catch (e: Throwable) {
+                Log.d(TAG,"Ooops: Something else went wrong: "+e.message!!)
 
             }
         }

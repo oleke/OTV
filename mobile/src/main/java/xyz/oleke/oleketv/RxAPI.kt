@@ -33,6 +33,14 @@ interface  RxAPI{
     @GET("/api/auth")
     fun authUser(@Query("email") email:String, @Query("password") password:String):Deferred<Model.User>
 
+
+    /*
+    * Get user
+     */
+    @GET("/api/users")
+    fun getUser(@Query("user_id") id:Int):Deferred<Model.User>
+
+
     /*
     * Add new user
      */

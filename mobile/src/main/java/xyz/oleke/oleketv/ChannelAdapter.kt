@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.recycler_view_item_1.view.*
 /*
     Class definition implementing the RecyclerView Adaper
  */
-class ChannelAdapter(private val myDataset: List<Model.Channel>, val clickListener: (Model.Channel) -> Boolean) :
+class ChannelAdapter(private val myDataset: List<Model.Channel>, val clickListener: (Model.Channel,Int) -> Boolean) :
     RecyclerView.Adapter<ChannelAdapter.MyViewHolder>() {
 
     // Provide a reference to the views for each data item
@@ -22,15 +22,17 @@ class ChannelAdapter(private val myDataset: List<Model.Channel>, val clickListen
     // you provide access to all the views for a data item in a view holder.
     // Each data item is just a string in this case that is shown in a TextView.
     class MyViewHolder(val channelView: ViewGroup) : RecyclerView.ViewHolder(channelView) {
-        fun bind(channel: Model.Channel, clickListener: (Model.Channel) -> Boolean) {
+        fun bind(channel: Model.Channel, position: Int, clickListener: (Model.Channel,Int) -> Boolean) {
             channelView.textView1.text = channel.name
             //println(channel.getName())
             var logo = channel.logo
             if(logo=="")
-                logo = "https://cdn2.iconfinder.com/data/icons/pictograms-3/512/25-512.png"
-            Glide.with(channelView.context).load(logo).into(channelView.imageView1)
+                channelView.imageView1.setImageResource(R.drawable.ic_small_logo)
+                //logo = "https://Otv-env.y32znjkj22.us-east-2.elasticbeanstalk.com/img/logo.png"
+            else
+                Glide.with(channelView.context).load(logo).into(channelView.imageView1)
             channelView.setOnClickListener {
-                clickListener(channel)
+                clickListener(channel,position)
             }
 
         }
@@ -54,7 +56,7 @@ class ChannelAdapter(private val myDataset: List<Model.Channel>, val clickListen
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         //println("Position: "+position)
-        holder.bind(myDataset[position], clickListener)
+        holder.bind(myDataset[position],position, clickListener)
 
     }
 
